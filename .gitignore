@@ -1,0 +1,9 @@
+# .NET
+backend/bin/
+backend/obj/
+appsettings.Development.json
+
+# Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
