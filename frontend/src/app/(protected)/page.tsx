@@ -3,7 +3,6 @@ import { getUser } from "@/lib/supabase/auth";
 // getUser() is cached — the layout already called it, so this is free (no extra DB query).
 export default async function Home() {
     const data = await getUser();
-    console.log(data);
 
     return (
         <div className="min-h-screen bg-gray-50">

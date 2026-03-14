@@ -30,7 +30,7 @@ export const getUser = cache(async (): Promise<UserData | null> => {
 
     if (!user) return null;
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select(`
             full_name,
@@ -42,7 +42,11 @@ export const getUser = cache(async (): Promise<UserData | null> => {
             )
         `)
         .eq("id", user.id)
-        .single() as { data: ProfileRow | null; error: unknown };
+        .single() as { data: ProfileRow | null; error: { message: string } | null };
+
+    if (profileError) {
+        throw new Error(`Failed to load user profile: ${profileError.message}`);
+    }
 
     const role = profile?.roles?.name || "user";
     const permissions: string[] = profile?.roles?.role_permissions?.map(
@@ -60,10 +64,10 @@ export async function requireAuth(): Promise<UserData> {
     return data;
 }
 
-// Redirects to / if the user doesn't have the required permission.
+// Redirects to /unauthorized if the user doesn't have the required permission.
 // Use at the top of any server component or page that needs a specific capability.
 export async function requirePermission(permission: string): Promise<UserData> {
     const data = await requireAuth();
-    if (!data.permissions.includes(permission)) redirect("/");
+    if (!data.permissions.includes(permission)) redirect("/unauthorized");
     return data;
 }
