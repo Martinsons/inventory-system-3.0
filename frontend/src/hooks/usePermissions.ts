@@ -38,6 +38,8 @@ export const usePermissions = () => {
             const { data: { user }, error: authError } = await supabase.auth.getUser();
             if (controller.signal.aborted) return;
 
+            // authError: Supabase returned an error — surface it.
+            // !user: no active session — not an error, just unauthenticated.
             if (authError || !user) {
                 setState({ role: "", permissions: [], loading: false, error: authError?.message ?? null });
                 return;
